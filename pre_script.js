@@ -28,7 +28,7 @@
             a.dispatchEvent(e);
         }
     }
-    // Thank you Adam Angle for these removal script - These are not necessary but will help ensure you only download
+    // Thank you Adam for these removal script - These are not necessary but will help ensure you only download
     // the images that you want if you are using this on KissManga.
     $('div#containerRoot>div').each(function (ind) {
         if ((ind) != 3) $(this).remove();
