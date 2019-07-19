@@ -7,7 +7,7 @@
             return;
         } else { // Else proceed on with processing
             // Determine the file name, based on user input or default value
-            fileName =  (fileName) ? fileName : 'img_sources.txt';
+            fileName =  (fileName && /^\w+\_\w+\.txt$/.test(fileName)) ? fileName : 'img_sources.txt';
             // If the data passed in is a JSON object then stringify it
             data = (typeof data !== "object") ? data : JSON.stringify(data, undefined, 4);
             // Declare Blob object and store the data that we want to write to a file

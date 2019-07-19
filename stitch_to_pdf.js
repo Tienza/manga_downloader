@@ -2,6 +2,7 @@
 
 const PDFDocument = require('pdfkit');
 const fs = require('fs');
+const path = require('path');
 
 const sysArgs = process.argv;
 
@@ -9,8 +10,8 @@ const tempDir = './temp';
 const outputDir = './output';
 
 const forceRotation = (sysArgs[2] && sysArgs[2] === '-r') ? true : false;
-const fileName = (forceRotation && sysArgs[3] && sysArgs[3].substring(sysArgs[3].length - 4) === '.pdf') ? sysArgs[3] : 
-                 (!forceRotation && sysArgs[2] && sysArgs[2].substring(sysArgs[2].length - 4 === '.pdf')) ? sysArgs[2] : 'output.pdf';
+const fileName = (forceRotation && sysArgs[3] && path.extname(sysArgs[3]) === '.pdf') ? sysArgs[3] : 
+                 (!forceRotation && sysArgs[2] && path.extname(sysArgs[2]) === '.pdf') ? sysArgs[2] : 'output.pdf';
                  
 const outputFilePath = outputDir + '/' + fileName;
 

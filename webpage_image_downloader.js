@@ -1,18 +1,19 @@
 'use strict'
 
 const fs = require('fs');
+const path = require('path');
 const request = require('request');
 
 const tempDir = './temp';
 
-let download = (uri, filename, callback) => {
+let download = (uri, fileName, callback) => {
     request.head(uri, (err, res, body) => {
         if (err) { // If there is an error throw it and perform no action
             throw err;
         } else { // Send the request to download the image
             console.log('content-type:', res.headers['content-type']);
             console.log('content-length:', res.headers['content-length']);
-            request(uri).pipe(fs.createWriteStream(filename)).on('close', callback);
+            request(uri).pipe(fs.createWriteStream(fileName)).on('close', callback);
         }
     });
 };
@@ -31,8 +32,8 @@ let downloadAll = (srcArr) => {
         let imgNum = (img.toString().length < padNum) ? '0'.repeat(padNum - img.toString().length) + img : img;
         // Grab the img url
         let imgURL =  srcArr[img];
-        // From the img url grab the last 4 characters, which would be the image extension
-        let extension = imgURL.substring(imgURL.length - 4);
+        // From the img url extract the extension
+        let extension = path.extname(imgURL);
         // Finalize the image location and name
         let fileName = tempDir + '/' + imgNum + extension;
         // Initialize download of image
