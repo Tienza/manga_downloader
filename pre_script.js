@@ -7,21 +7,21 @@
             return;
         } else { // Else proceed on with processing
             // Determine the file name, based on user input or default value
-            fileName =  (fileName && /^\w+\_\w+\.txt$/.test(fileName)) ? fileName : 'img_sources.txt';
+            fileName = (fileName && /^\w+\_\w+\.txt$/.test(fileName)) ? fileName : 'img_sources.txt';
             // If the data passed in is a JSON object then stringify it
             data = (typeof data !== "object") ? data : JSON.stringify(data, undefined, 4);
             // Declare Blob object and store the data that we want to write to a file
             let blob = new Blob([data], {type: 'text/json'});
             // Declare a MouseEvent variable to be used when downloading the file
-            let e    = document.createEvent('MouseEvents');
+            let e = document.createEvent('MouseEvents');
             // Declare an Anchor tag to store the file download information
-            let a    = document.createElement('a');
+            let a = document.createElement('a');
             // Set the Anchor download option as the file name
             a.download = fileName
             // Set the Anchor href as a new in-window URL
             a.href = window.URL.createObjectURL(blob);
             // Set the Anchor data set
-            a.dataset.downloadurl =  ['text/json', a.download, a.href].join(':');
+            a.dataset.downloadurl = ['text/json', a.download, a.href].join(':');
             // Declare the type of mouse event to act upon the Anchor tag
             e.initMouseEvent('click', true, false, window, 0, 0, 0, 0, 0, false, false, false, false, 0, null);
             // Dispatch and MouseEvent on the Anchor tag
