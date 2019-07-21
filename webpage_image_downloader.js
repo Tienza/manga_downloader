@@ -29,7 +29,8 @@ let download = (uri, fileName, callback) => {
 };
 
 let downloadAllAndStitchToPdf = (srcArr, forceRotation, outputFileName) => {
-    let counter = 0;
+    // Variable to keep track of the number of images successfully downloaded
+    let downloadedNum = 0;
     // If the ./temp/ directory doesn't exit, then create it
     if (!fs.existsSync(tempDir)) {
         fs.mkdirSync(tempDir);
@@ -50,8 +51,10 @@ let downloadAllAndStitchToPdf = (srcArr, forceRotation, outputFileName) => {
         // Initialize download of image
         download(imgURL, fileName, () => {
             console.log('Finished Downloading: ' + fileName);
-            ++counter;
-            if (counter === srcArr.length) {
+            // Increment downloadedNum after successful file download
+            ++downloadedNum;
+            // Once all files are downloaded invoke stitchToPdf
+            if (downloadedNum === srcArr.length) {
                 pdfWriter.stitchToPdf(forceRotation, outputFileName);
             }
 
