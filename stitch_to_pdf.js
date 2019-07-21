@@ -2,20 +2,14 @@
 
 const PDFDocument = require('pdfkit');
 const fs = require('fs');
-const path = require('path');
-
-const sysArgs = process.argv;
 
 const tempDir = './temp';
 const outputDir = './output';
 
-const forceRotation = (sysArgs[2] && sysArgs[2] === '-r') ? true : false;
-const fileName = (forceRotation && sysArgs[3] && path.extname(sysArgs[3]) === '.pdf') ? sysArgs[3] : 
-                 (!forceRotation && sysArgs[2] && path.extname(sysArgs[2]) === '.pdf') ? sysArgs[2] : 'output.pdf';
-                 
-const outputFilePath = outputDir + '/' + fileName;
-
-let main = () => {
+module.exports.main = (forceRotation, fileName) => {
+   console.log('stitch_to_pdf running...');
+   //
+   let outputFilePath = outputDir + '/' + fileName;
    // If the ./temp/ directory doesn't exit, then create it
    if (!fs.existsSync(tempDir)) {
       fs.mkdirSync(tempDir);
@@ -91,6 +85,3 @@ let main = () => {
    });
 
 };
-
-console.log('stitch_to_pdf running...');
-main();
