@@ -52,7 +52,7 @@ let downloadAllAndStitchToPdf = (srcArr, forceRotation, outputFileName) => {
             console.log('Finished Downloading: ' + fileName);
             ++counter;
             if (counter === srcArr.length) {
-                pdfWriter.main(forceRotation, outputFileName);
+                pdfWriter.stitchToPdf(forceRotation, outputFileName);
             }
 
         });
@@ -62,7 +62,7 @@ let main = () => {
     console.log('kiss_manga_downloader running...');
     // Read img_sources.txt and put all the url(s) into an array
     let srcArr = fs.readFileSync('img_sources.txt').toString().trim().split(/\r?\n/);
-    if (srcArr.length > 0) { // Only run if img_sources.txt is not empty
+    if (srcArr.length > 0 && srcArr[0].trim() !== '') { // Only run if img_sources.txt is not empty
         downloadAllAndStitchToPdf(srcArr, forceRotation, outputFileName);
     } else { // Exit the process with a failed status so that the next part doesn't run in the .sh file
         console.log('Empty img_sources.txt, Please enter valid img url(s) and try again');

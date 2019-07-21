@@ -6,7 +6,7 @@ const fs = require('fs');
 const tempDir = './temp';
 const outputDir = './output';
 
-module.exports.main = (forceRotation, fileName) => {
+module.exports.stitchToPdf = (forceRotation, fileName) => {
    console.log('stitch_to_pdf running...');
    //
    let outputFilePath = outputDir + '/' + fileName;
