@@ -2,13 +2,16 @@
 
 const PDFDocument = require('pdfkit');
 const fs = require('fs');
+const path = require('path');
+const readLine = require('readline').createInterface({
+   input: process.stdin,
+   output: process.stdout
+ });
 
 const tempDir = './temp';
 const outputDir = './output';
 
-module.exports.stitchToPdf = (forceRotation, fileName) => {
-   console.log('stitch_to_pdf running...');
-   //
+let stitchToPdf = (forceRotation, fileName) => {
    let outputFilePath = outputDir + '/' + fileName;
    // If the ./temp/ directory doesn't exit, then create it
    if (!fs.existsSync(tempDir)) {
@@ -85,3 +88,46 @@ module.exports.stitchToPdf = (forceRotation, fileName) => {
    });
 
 };
+
+module.exports.preOutputCheck = (forceRotation, fileName) => {
+   console.log('stitch_to_pdf running...');
+   // Check if the output file the user specified already exists
+   if (fs.existsSync(outputDir + '/' + fileName)) { // If it does prompt user to decide next action
+      readLine.setPrompt('Specified output file already exists, overwrite? (y/n): ');
+      readLine.prompt();
+      readLine.on('line', (response) => {
+         if (response === 'n') { // If the user doesn't want to overwrite, prompt user to rename file
+            readLine.setPrompt('New output file name: ');
+            readLine.prompt();
+            readLine.on('line', (newFileName) => {
+               if (/[a-zA-Z0-9_].?p?d?f?/.test(newFileName)) { // If new file name is valid proceed on
+                  // Add .pdf extension to file - if necessary
+                  newFileName = (path.extname(newFileName) === '.pdf') ? newFileName : newFileName + '.pdf';
+                  // Set empty prompt and reprompt so there is not extra printed line of previous prompt
+                  // Very Hacky Solution
+                  readLine.setPrompt('');
+                  readLine.prompt();
+                  // Close User Input interface
+                  readLine.close();
+                  // Pass in new output file name and proceed
+                  stitchToPdf(forceRotation, newFileName);
+               } else { // Change prompt and give example of valid file name
+                  readLine.setPrompt('Please enter a valid file name (ex. \'manga_name_53.pdf\'): ');
+                  readLine.prompt();
+               }
+            });
+         } else if (response === 'y') { // If the user wants to overwrite, proceed without change
+            // Close User Input interface
+            readLine.close();
+            console.log('Overwriting file');
+            stitchToPdf(forceRotation, fileName);
+         } else { // If the user doesn't provide a valid response, reprompt
+            readLine.prompt();
+         }
+      });
+   } else { // If it doesn't then proceed without change
+      stitchToPdf(forceRotation, fileName);
+      // Close User Input interface
+      readLine.close();
+   }
+}

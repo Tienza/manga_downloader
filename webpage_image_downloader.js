@@ -11,8 +11,8 @@ const forceRotation = (sysArgs[2] && sysArgs[2] === '-r') ? true : false;
 const tempDir = './temp';
 
 // Retrieve the desired output file name from user input, otherwise assign default file name
-let outputFileName = (forceRotation && sysArgs[3]) ? sysArgs[3] : (!forceRotation && sysArgs[2]) 
-                        ? sysArgs[2] : 'output.pdf';
+let outputFileName = (forceRotation && sysArgs[3]) ? sysArgs[3].trim() : (!forceRotation && sysArgs[2]) 
+                        ? sysArgs[2].trim() : 'output.pdf';
 // Check if user provided file name is a valid pdf file type, otherwise append extension
 outputFileName = (path.extname(outputFileName) === '.pdf') ? outputFileName : outputFileName + '.pdf';
 
@@ -53,11 +53,10 @@ let downloadAllAndStitchToPdf = (srcArr, forceRotation, outputFileName) => {
             console.log('Finished Downloading: ' + fileName);
             // Increment downloadedNum after successful file download
             ++downloadedNum;
-            // Once all files are downloaded invoke stitchToPdf
+            // Once all files are downloaded invoke pdfWriter entry function
             if (downloadedNum === srcArr.length) {
-                pdfWriter.stitchToPdf(forceRotation, outputFileName);
+                pdfWriter.preOutputCheck(forceRotation, outputFileName); 
             }
-
         });
     }
 };
