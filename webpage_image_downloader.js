@@ -62,6 +62,7 @@ let downloadAllAndStitchToPdf = (srcArr, forceRotation, outputFileName) => {
 };
 let main = () => {
     console.log('kiss_manga_downloader running...');
+    console.log('Forced Rotation Mode: ' + forceRotation);
     // Read img_sources.txt and put all the url(s) into an array
     let srcArr = fs.readFileSync('img_sources.txt').toString().trim().split(/\r?\n/);
     if (srcArr.length > 0 && srcArr[0].trim() !== '') { // Only run if img_sources.txt is not empty

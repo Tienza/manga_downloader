@@ -91,18 +91,22 @@ let stitchToPdf = (forceRotation, fileName) => {
 
 module.exports.preOutputCheck = (forceRotation, fileName) => {
    console.log('stitch_to_pdf running...');
-   // Check if the output file the user specified already exists
-   if (fs.existsSync(outputDir + '/' + fileName)) { // If it does prompt user to decide next action
-      readLine.setPrompt('Specified output file already exists, overwrite? (y/n): ');
+   let fileExists = fs.existsSync(outputDir + '/' + fileName);
+   let invalidFileName = !/^[a-zA-Z0-9_]+.?p?d?f?$/.test(fileName);
+   // Check if the output file the user specified already exists or if the file name provided is invalid
+   if (fileExists || invalidFileName) {
+      let prompt = (fileExists) ? 'Specified output file already exists, overwrite? (y/n): ' 
+                                : 'The file name provided in invalid, rename? (y/n): ';
+      readLine.setPrompt(prompt);
       readLine.prompt();
       readLine.on('line', (response) => {
-         if (response === 'n') { // If the user doesn't want to overwrite, prompt user to rename file
+         if (fileExists && response === 'n' || invalidFileName && response === 'y') { // Prompt user to rename file
             readLine.setPrompt('New output file name: ');
             readLine.prompt();
             readLine.on('line', (newFileName) => {
-               if (/[a-zA-Z0-9_].?p?d?f?/.test(newFileName)) { // If new file name is valid proceed on
-                  // Add .pdf extension to file - if necessary
-                  newFileName = (path.extname(newFileName) === '.pdf') ? newFileName : newFileName + '.pdf';
+               // Add .pdf extension to file - if necessary
+               newFileName = (path.extname(newFileName) === '.pdf') ? newFileName : newFileName + '.pdf';
+               if (/^[a-zA-Z0-9_]+.?p?d?f?$/.test(newFileName) && !fs.existsSync(outputDir + '/' + newFileName)) { // If new file name is valid proceed on
                   // Set empty prompt and reprompt so there is not extra printed line of previous prompt
                   // Very Hacky Solution
                   readLine.setPrompt('');
@@ -112,20 +116,39 @@ module.exports.preOutputCheck = (forceRotation, fileName) => {
                   // Pass in new output file name and proceed
                   stitchToPdf(forceRotation, newFileName);
                } else { // Change prompt and give example of valid file name
-                  readLine.setPrompt('Please enter a valid file name (ex. \'manga_name_53.pdf\'): ');
+                  readLine.setPrompt('Please enter a valid and/or currently nonexistent file name (ex. \'manga_name_53.pdf\'): ');
                   readLine.prompt();
                }
             });
-         } else if (response === 'y') { // If the user wants to overwrite, proceed without change
+         } else if (fileExists && response === 'y') { // If the user wants to overwrite, proceed without change
             // Close User Input interface
             readLine.close();
             console.log('Overwriting file');
             stitchToPdf(forceRotation, fileName);
+         } else if (invalidFileName && response === 'n') {
+            // Close User Input interface
+            readLine.close();
+            console.log('Oh no, look what you made me do. This is what you get...Deleting all downloaded images');
+            // Delete all the downloaded image to spite the user :P
+            fs.readdir(tempDir, (err, files) => {
+               if (err) {
+                  throw err;
+               }
+               files.forEach((file) => {
+                  fs.unlink(path.join(tempDir, file), (err) => {
+                     if (err) {
+                        throw err;
+                     }
+                  });
+               });
+               process.exit();
+             });
+            console.log('Well, nothing I can do now. Guess I\'ll just die...');
          } else { // If the user doesn't provide a valid response, reprompt
             readLine.prompt();
          }
       });
-   } else { // If it doesn't then proceed without change
+   } else { // If it doesn't and file name is valid then proceed without change
       stitchToPdf(forceRotation, fileName);
       // Close User Input interface
       readLine.close();
