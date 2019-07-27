@@ -11,7 +11,29 @@ const readLine = require('readline').createInterface({
 const tempDir = './temp';
 const outputDir = './output';
 
-let stitchToPdf = (forceRotation, fileName) => {
+const rotateRatio = 90;
+
+const kindlePaperWhiteMaxWidth = 1448;
+const kindlePaperWhiteMaxHeight = 1072;
+
+let checkAndRotate = (forceRotation, doc, index, imgWidth, imgHeight) => {
+   if (forceRotation && imgWidth > imgHeight) {
+      doc.page.dictionary.data.Rotate = rotateRatio;
+      doc._root.data.Pages.data.Kids[index] = doc.page.dictionary;
+      console.log('Page rotated');
+   }
+};
+
+let checkAndScale = (kindleOptimized, pageWidth, pageHeight) => {
+   if (kindleOptimized && pageWidth > kindlePaperWhiteMaxWidth && pageHeight > kindlePaperWhiteMaxHeight) {
+      pageWidth = kindlePaperWhiteMaxWidth;
+      pageHeight = kindlePaperWhiteMaxHeight;
+      console.log('Image scaled down');
+   }
+   return {width: pageWidth, height: pageHeight};
+}
+
+let stitchToPdf = (forceRotation, kindleOptimized, fileName) => {
    let outputFilePath = outputDir + '/' + fileName;
    // If the ./temp/ directory doesn't exit, then create it
    if (!fs.existsSync(tempDir)) {
@@ -36,38 +58,36 @@ let stitchToPdf = (forceRotation, fileName) => {
             let currentFile = tempDir + '/' + file;
             if (firstPass) { // Initialize output file setup
                // Open the first image
-               let tempImg = temp.openImage(currentFile);
-               // Create the output document - using size info from tempImg
+               let img = temp.openImage(currentFile);
+               // Create the output document - using size info from tempImg - scale if too large
+               let pageDimension = checkAndScale(kindleOptimized, img.width, img.height);
+               let pageWidth = pageDimension.width;
+               let pageHeight = pageDimension.height;
                doc = new PDFDocument({
                   layout: 'portrait',
-                  size: [tempImg.width, tempImg.height]
+                  size: [pageWidth, pageHeight]
                });
                // Pipe output to pdf file
                doc.pipe(fs.createWriteStream(outputFilePath));
                console.log(`Created ${outputFilePath}`);
-               // Append the first image
-               doc.image(tempImg, 0, 0);
+               // Append the first image - scale the image if it is too large
+               doc.image(img, 0, 0, {width: pageWidth, height: pageHeight});
                console.log(`Added ${currentFile} to ${outputFilePath}`);
-               if (forceRotation && tempImg.width > tempImg.height) {
-                  console.log('Page rotated');
-                  doc.page.dictionary.data.Rotate = 90;
-                  // where 0 is the current page number.
-                  doc._root.data.Pages.data.Kids[index] = doc.page.dictionary;
-               }
+               checkAndRotate(forceRotation, doc, index, img.width, img.height);
                // Deallocate the first PDFDocument
                temp.end();
                // First pass is now complete
                firstPass = false;
             } else { // Append next image
                let img = doc.openImage(currentFile);
-               doc.addPage({size: [img.width, img.height]}).image(img, 0, 0);
+               // Create the output document - using size info from tempImg - scale if too large
+               let pageDimension = checkAndScale(kindleOptimized, img.width, img.height);
+               let pageWidth = pageDimension.width;
+               let pageHeight = pageDimension.height;
+               // Append the first image - scale the image if it is too large
+               doc.addPage({size: [pageWidth, pageHeight]}).image(img, 0, 0, {width: pageWidth, height: pageHeight});
                console.log(`Added ${currentFile} to ${outputFilePath}`);
-               if (forceRotation && img.width > img.height) {
-                  console.log('Page rotated');
-                  doc.page.dictionary.data.Rotate = 90;
-                  // where 0 is the current page number.
-                  doc._root.data.Pages.data.Kids[index] = doc.page.dictionary;
-               }
+               checkAndRotate(forceRotation, doc, index, img.width, img.height);
             }
             // Remove images after they have been written to the output pdf file 
             fs.unlink(currentFile, (err) => {
@@ -89,7 +109,7 @@ let stitchToPdf = (forceRotation, fileName) => {
 
 };
 
-module.exports.preOutputCheck = (forceRotation, fileName) => {
+module.exports.preOutputCheck = (forceRotation, kindleOptimized, fileName) => {
    console.log('stitch_to_pdf running...');
    let fileExists = fs.existsSync(outputDir + '/' + fileName);
    let invalidFileName = !/^[a-zA-Z0-9_]+.?p?d?f?$/.test(fileName);
@@ -114,7 +134,7 @@ module.exports.preOutputCheck = (forceRotation, fileName) => {
                   // Close User Input interface
                   readLine.close();
                   // Pass in new output file name and proceed
-                  stitchToPdf(forceRotation, newFileName);
+                  stitchToPdf(forceRotation, kindleOptimized, newFileName);
                } else { // Change prompt and give example of valid file name
                   readLine.setPrompt('Please enter a valid and/or currently nonexistent file name (ex. \'manga_name_53.pdf\'): ');
                   readLine.prompt();
@@ -124,7 +144,7 @@ module.exports.preOutputCheck = (forceRotation, fileName) => {
             // Close User Input interface
             readLine.close();
             console.log('Overwriting file');
-            stitchToPdf(forceRotation, fileName);
+            stitchToPdf(forceRotation, kindleOptimized, fileName);
          } else if (invalidFileName && response === 'n') {
             // Close User Input interface
             readLine.close();
@@ -149,7 +169,7 @@ module.exports.preOutputCheck = (forceRotation, fileName) => {
          }
       });
    } else { // If it doesn't and file name is valid then proceed without change
-      stitchToPdf(forceRotation, fileName);
+      stitchToPdf(forceRotation, kindleOptimized, fileName);
       // Close User Input interface
       readLine.close();
    }
