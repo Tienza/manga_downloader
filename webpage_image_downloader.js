@@ -5,8 +5,9 @@ const path = require('path');
 const request = require('request');
 
 const tempDir = './temp';
+const inputFileName = 'img_sources.txt';
 
-let download = (uri, fileName, callback) => {
+let downloadFile = (uri, fileName, callback) => {
     request.head(uri, (err, res, body) => {
         if (err) { // If there is an error throw it and perform no action
             throw err;
@@ -18,9 +19,9 @@ let download = (uri, fileName, callback) => {
     });
 };
 
-let downloadAll = (srcArr, callback) => {
+let downloadAll = (srcArr, imgSrcFileName = '', callback) => {
     // Variable to keep track of the number of images successfully downloaded
-    let downloadedNum = 0;
+    let downloadedImgPaths = [];
     // If the ./temp/ directory doesn't exit, then create it
     if (!fs.existsSync(tempDir)) {
         fs.mkdirSync(tempDir);
@@ -37,26 +38,32 @@ let downloadAll = (srcArr, callback) => {
         // From the img url extract the extension
         let extension = path.extname(imgURL);
         // Finalize the image location and name
-        let fileName = tempDir + '/' + imgNum + extension;
+        let fileName = `${tempDir}/${imgSrcFileName}.${imgNum}${extension}`;
         // Initialize download of image
-        download(imgURL, fileName, () => {
+        downloadFile(imgURL, fileName, () => {
             console.log('Finished Downloading: ' + fileName);
-            // Increment downloadedNum after successful file download
-            ++downloadedNum;
-            // Once all files are downloaded invoke the callback function
-            if (callback && downloadedNum === srcArr.length) {
-                callback();
+            // Add file path to downloadedImgPaths after successful file download
+            downloadedImgPaths.push(fileName);
+            // Post download actions
+            if (downloadedImgPaths.length === srcArr.length) {
+                // Sort the downloaded file paths
+                downloadedImgPaths = downloadedImgPaths.sort();
+                // Overwrite imgSrcFile with file paths
+                console.log(`Overwriting ${imgSrcFileName} with file paths...`);
+                fs.writeFileSync(imgSrcFileName, downloadedImgPaths.join('\n'));
+                // Invoke the callback function is not null
+                if (callback) callback();
             }
         });
     }
 };
 
-module.exports.initDownloadAll = (callback = null) => {
+module.exports.initDownloadAll = (imgSrcFileName = inputFileName, callback = null) => {
     console.log('webpage_image_downloader running...');
     // Read img_sources.txt and put all the url(s) into an array
-    let srcArr = fs.readFileSync('img_sources.txt').toString().trim().split(/\r?\n/);
+    let srcArr = fs.readFileSync(imgSrcFileName).toString().trim().split(/\r?\n/);
     if (srcArr.length > 0 && srcArr[0].trim() !== '') { // Only run if img_sources.txt is not empty
-        downloadAll(srcArr, callback);
+        downloadAll(srcArr, imgSrcFileName, callback);
     } else { // Exit the process with a failed status so that the next part doesn't run in the .sh file
         console.log('Empty img_sources.txt, Please enter valid img url(s) and try again');
         process.exit(1);
