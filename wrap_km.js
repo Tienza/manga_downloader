@@ -11,6 +11,7 @@ let ivUpdated = false;
 let ivStr = fs.readFileSync(ivFile).toString();
 let iv = CryptoJS.enc.Hex.parse(ivStr);
 
+// Function to decrypt KM img hash
 let decryptKMKey = (key, str) => {
     let r20 = CryptoJS.lib.CipherParams.create({
         ciphertext: CryptoJS.enc.Base64.parse(str)
@@ -23,24 +24,23 @@ let decryptKMKey = (key, str) => {
 
     return plaintext.toString(CryptoJS.enc.Utf8);
 };
-
+// Function to pass in multiple KM img hashes to be decrypted and returned
 module.exports.decryptKMKeys = (wrapKMKey, encodedStrs) => {
-    let chko = helper.hexToAscii(wrapKMKey);
-    let key = CryptoJS.SHA256(chko);
-
-    if (ivUpdated) {
+    // Generate the CryptoJS key used to decrypt KM img hashes
+    let key = CryptoJS.SHA256(helper.hexToAscii(wrapKMKey));
+    if (ivUpdated) { // Check to is if the ivUpdated flag is set, if it is then update global variable
         iv = CryptoJS.enc.Hex.parse(fs.readFileSync(ivFile).toString());
         ivUpdated = false;
     }
-
+    // Decode all img hashes that were passed in and return as str[]
     return encodedStrs.map((currVal) => decryptKMKey(key, currVal));
 };
-
+// Function to verify whether the initialization vector on KM has been changed and update accordingly
 module.exports.decryptAndUpdateLoVars = (encodedStrs) => {
-    // Verify that the initialization vector hasn't changed
     let loIV = helper.hexToAscii(encodedStrs[20].match(/^\"(.*)\"$/)[1]);
     if (loIV !== ivStr) { // If the vector has changed then update ivFile with the new variable
         fs.writeFileSync(ivFile, loIV);
+        // Flag the the IV has been updated so that the current stored variable will be updated
         ivUpdated = true;
         console.log('Initialization vector has changed, source file has been updated');
     }

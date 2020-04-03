@@ -25,24 +25,17 @@ let checkAndGenerateSysArgs = (sysArgs, autoGenOutputFileName = null) => {
     // Initialize default values for the system arguments
     let forceRotation = false;
     let kindleOptimized = false;
-    let outputFileName = defaultFileName;
+    let outputFileName = (autoGenOutputFileName !== null) ? autoGenOutputFileName : defaultFileName;
     let titleSuggested = false;
-    // Check to see if any arguments have been repeated - if they have end processing
-    if ((new Set(sysArgs).size === sysArgs.length)) {
-        // Check to see if the following optional parameters were passed in
-        forceRotation = (sysArgs.indexOf('-r') !== -1);
-        kindleOptimized = (sysArgs.indexOf('-k') !== -1);
-        // Find the specified file name - which should always be the final argument that is passed in
-        if (autoGenOutputFileName !== null) {
-            outputFileName = autoGenOutputFileName;
-        } else if (sysArgs[sysArgs.length - 1] && validTitleRegEx.test(sysArgs[sysArgs.length - 1])) {
-            outputFileName = sysArgs[sysArgs.length - 1];
-        } else {
-            console.log(`Output file name defaulted to '${defaultFileName}'`);
-        }
+    // Check to see if the following optional parameters were passed in
+    forceRotation = (sysArgs.indexOf('-r') !== -1);
+    kindleOptimized = (sysArgs.indexOf('-k') !== -1);
+    // Find the specified file name - which should always be the final argument that is passed in
+    if (outputFileName === defaultFileName 
+        && sysArgs[sysArgs.length - 1] && validTitleRegEx.test(sysArgs[sysArgs.length - 1])) {
+        outputFileName = sysArgs[sysArgs.length - 1];
     } else {
-        console.log('Duplicate arguments detected. I could add more logic to address this, but I\'m lazy ' +
-            'right now so...returning default values for everything');
+        console.log(`Output file name defaulted to '${defaultFileName}'`);
     }
     return {
         forceRotation: forceRotation,
