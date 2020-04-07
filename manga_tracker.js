@@ -71,7 +71,7 @@ const setDiff = (a, b) => {
                 if (status === helper.STATUS_COMPLETED) completedManga.push(mangaName)
             }, console.error);
         } else {
-            console.log(`${mangaName} - Paused: ${currManga.paused} - Skipping...`);
+            console.log(`${mangaName}: Paused | Skipping...`);
         }
         
     }
