@@ -2,6 +2,7 @@
 
 const CryptoJS = require('crypto-js');
 const fs = require('fs');
+
 const helper = require('./helper');
 
 const ivFile = './km_iv.txt';
@@ -37,7 +38,9 @@ module.exports.decryptKMKeys = (wrapKMKey, encodedStrs) => {
 };
 // Function to verify whether the initialization vector on KM has been changed and update accordingly
 module.exports.decryptAndUpdateLoVars = (encodedStrs) => {
-    let loIV = helper.hexToAscii(encodedStrs[20].match(/^\"(.*)\"$/)[1]);
+    let iv = encodedStrs[20].match(/^\"(.*)\"$/);
+    iv = (iv.length > 1) ? iv[1] : helper.KM_INITIALIZATION_VECTOR;
+    let loIV = helper.hexToAscii(iv);
     if (loIV !== ivStr) { // If the vector has changed then update ivFile with the new variable
         fs.writeFileSync(ivFile, loIV);
         // Flag the the IV has been updated so that the current stored variable will be updated

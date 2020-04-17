@@ -14,7 +14,7 @@ const kmPrefix = 'https://kissmanga.com';
 const kmLinkPrefix = kmPrefix + '/Manga/'
 
 const setDiff = (a, b) => {
-    return a.filter(x => !b.has(x));
+    return a.filter((currVal) => !b.has(currVal));
 };
 
 (async () => {
@@ -36,7 +36,7 @@ const setDiff = (a, b) => {
         // Retrieve the object that stores all information for current manga
         let currManga = trackedManga[mangaName];
         // Check to see if the status of the manga is pau
-        if (currManga.paused == undefined || !currManga.paused) {
+        if (currManga.paused === undefined || currManga.paused === null || !currManga.paused) {
             // Open the manga url in a headless browser
             await cloudscraper.get(kmLinkPrefix + mangaName).then((response) => {
                 // Retrieve the manga's current status from the response body
@@ -52,7 +52,7 @@ const setDiff = (a, b) => {
                 // If the number of chapters found in the obj and the response body don't match 
                 if (currManga.tracked.length !== totalChapters.length) {
                     updatedNeeded = true; // Flag that the manage has been updated
-                    console.log(`${mangaName}: Missing ${totalChapters.length - currManga.tracked.length} Chapter(s)| Download Limit: ${(currManga.limit !== undefined) ? currManga.limit : 'null'} | Status: ${status}`);
+                    console.log(`${mangaName}: Missing ${totalChapters.length - currManga.tracked.length} Chapter(s)| Download Limit: ${(currManga.limit !== undefined && currManga.limit !== null) ? currManga.limit : 'null'} | Status: ${status}`);
                     // From all the chapter links, filter out the ones we currently do not track
                     let missingChapterLinks = setDiff(totalChapters, new Set(currManga.tracked));
                     // Check if a limit has been set filter out the missingLinks again
@@ -60,7 +60,7 @@ const setDiff = (a, b) => {
                         missingChapterLinks = missingChapterLinks.slice(missingChapterLinks.length - currManga.limit);
                     }
                     // Update tracked_manga object
-                    currManga.tracked = (currManga.limit === undefined) ? totalChapters : missingChapterLinks.concat(currManga.tracked);
+                    currManga.tracked = (currManga.limit === undefined || currManga.limit === null) ? totalChapters : missingChapterLinks.concat(currManga.tracked);
                     // Append all the links that need to be downloaded to urls.txt
                     fs.appendFileSync(helper.URLS_FILE_NAME, 
                         missingChapterLinks.map((currVal) => kmPrefix + currVal).join('\n') + '\n');
@@ -73,7 +73,6 @@ const setDiff = (a, b) => {
         } else {
             console.log(`${mangaName}: Paused | Skipping...`);
         }
-        
     }
     // If there are manga that are currently being tracked that have been marked as Completed
     if (completedManga.length > 0) {

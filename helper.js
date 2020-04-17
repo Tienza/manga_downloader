@@ -14,6 +14,8 @@ module.exports.FORCE_ROTATION = '-r';
 
 module.exports.KINDLE_OPTIMIZED = '-k';
 
+module.exports.KM_INITIALIZATION_VECTOR = '\x61\x35\x65\x38\x65\x32\x65\x39\x63\x32\x37\x32\x31\x62\x65\x30\x61\x38\x34\x61\x64\x36\x36\x30\x63\x34\x37\x32\x63\x31\x66\x33';
+
 module.exports.NULL_ARG = () => {
     return (new Date()).getTime(); 
 }

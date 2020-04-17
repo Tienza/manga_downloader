@@ -2,6 +2,7 @@
 
 const cloudscraper = require('cloudscraper');
 const fs = require('fs');
+
 const wrapKM = require('./wrap_km');
 const helper = require('./helper')
 
@@ -19,7 +20,10 @@ let capturePageImageLinks = async (url, writeToFile = false, outputFileName = he
         // Retrieve all relevant img hashes from the response body
         let imgMatches = response.match(new RegExp(kmPageImgLinksRegex, 'g'));
         // From the img hashes previously retrieved, remove unnecessary text and return just img hash
-        let encodedStrs = imgMatches.map((currVal) => currVal.match(kmPageImgLinksRegex)[1]);
+        let encodedStrs = imgMatches.map((currVal) => {
+                                        let link = currVal.match(kmPageImgLinksRegex);
+                                        if (link.length > 1) return link[1];
+                                    });
         // Decode all img hashes and return the img download links
         let imgLinks = wrapKM.decryptKMKeys(wrapKAKey, encodedStrs).join('\n');
         console.log('Successfully retrieved image links');
@@ -31,15 +35,15 @@ let capturePageImageLinks = async (url, writeToFile = false, outputFileName = he
             console.log(imgLinks);
         }
         // If a callback function was passed in and is valid, invoke callback function
-        if (callback) {
-            callback();
-        }
+        if (callback) callback();
     }, console.error);
 };
 // Function to query ${loURL} and retrieve all relevant variables to be verified
 module.exports.checkAndUpdateKMVariables = async () => {
     await cloudscraper.get(loURL).then((response) => {
-        let loVars = response.match(/var\s+\_0x331e\=\[(.*)\];\(function\(\_0xfac5x1/)[1].split(',');
+        let loVars = response.match(/var\s+\_0x331e\=\[(.*)\];\(function\(\_0xfac5x1/);
+        if (loVars.length > 1) 
+            loVar = loVars[1].split(',');
         wrapKM.decryptAndUpdateLoVars(loVars);
     }, console.error);
 };

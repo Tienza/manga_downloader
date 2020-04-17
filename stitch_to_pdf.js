@@ -18,8 +18,8 @@ const defaultFileName = 'output.pdf';
 
 const rotateRatio = 90;
 
-const kindlePaperWhiteMaxWidth = 1448;
-const kindlePaperWhiteMaxHeight = 1072;
+const kindlePaperWhiteLong = 1448;
+const kindlePaperWhiteShort = 1072;
 
 let checkAndGenerateSysArgs = (sysArgs, autoGenOutputFileName = null) => {
     // Initialize default values for the system arguments
@@ -34,7 +34,7 @@ let checkAndGenerateSysArgs = (sysArgs, autoGenOutputFileName = null) => {
     if (outputFileName === defaultFileName 
         && sysArgs[sysArgs.length - 1] && validTitleRegEx.test(sysArgs[sysArgs.length - 1])) {
         outputFileName = sysArgs[sysArgs.length - 1];
-    } else {
+    } else if (outputFileName === defaultFileName) {
         console.log(`Output file name defaulted to '${defaultFileName}'`);
     }
     return {
@@ -55,11 +55,16 @@ let checkAndRotate = (forceRotation, doc, index, imgWidth, imgHeight) => {
 };
 
 let checkAndScale = (kindleOptimized, pageWidth, pageHeight) => {
-    // Scale the image down only if both width and height are larger than the Kindle Paperwhite's dimensions
-    // Because otherwise the default scaling built into the Kindle should take over
-    if (kindleOptimized && pageWidth > kindlePaperWhiteMaxWidth && pageHeight > kindlePaperWhiteMaxHeight) {
-        pageWidth = kindlePaperWhiteMaxWidth;
-        pageHeight = kindlePaperWhiteMaxHeight;
+    // Scale down image if either the width or height of the image is larger Kindle Paper White Screen
+    if (kindleOptimized && (pageWidth > kindlePaperWhiteLong || pageHeight > kindlePaperWhiteShort)) {
+        // Determine the orientation of the file-to-be-scaled, and scale accordingly
+        if (pageWidth > pageHeight) {    
+            pageWidth = (pageWidth > kindlePaperWhiteLong) ? kindlePaperWhiteLong : pageWidth;
+            pageHeight = (pageHeight > kindlePaperWhiteShort) ?  kindlePaperWhiteShort : pageHeight;
+        } else {
+            pageWidth = (pageWidth > kindlePaperWhiteShort) ? kindlePaperWhiteShort : pageWidth;
+            pageHeight = (pageHeight > kindlePaperWhiteLong) ? kindlePaperWhiteLong : pageHeight;
+        }
         console.log('Image scaled down');
     }
     return { width: pageWidth, height: pageHeight };
@@ -75,9 +80,8 @@ let stitchToPdf = (imgPathFileName = helper.DEFAULT_IMG_SRC, forceRotation, kind
     if (!fs.existsSync(outputDir)) {
         fs.mkdirSync(outputDir);
     }
-
+    // List to store all the relevant image paths
     let imgPaths = [];
-    
     // Create temporary PDFDocument to get size of first image
     let temp = new PDFDocument();
     // Place holder for real output file - First page set using size info from temp
@@ -109,8 +113,10 @@ let stitchToPdf = (imgPathFileName = helper.DEFAULT_IMG_SRC, forceRotation, kind
                 let img = temp.openImage(currentFile.fileName);
                 // Create the output document - using size info from tempImg - scale if too large
                 let pageDimension = checkAndScale(kindleOptimized, img.width, img.height);
+                // Dimensions of the first page
                 let pageWidth = pageDimension.width;
                 let pageHeight = pageDimension.height;
+                // Create the output document to start stitching together the manga
                 doc = new PDFDocument({
                     layout: 'portrait',
                     size: [pageWidth, pageHeight]
