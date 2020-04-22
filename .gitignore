@@ -1,3 +1,4 @@
 # Ignore temp/ and output/ dirs
 temp/
 output/
+node_modules/
