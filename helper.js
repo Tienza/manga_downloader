@@ -1,5 +1,7 @@
 'use strict'
 
+const fs = require('fs');
+
 module.exports.DEFAULT_IMG_SRC = './img_sources.txt';
 
 module.exports.URLS_FILE_NAME = './urls.txt';
@@ -14,7 +16,17 @@ module.exports.FORCE_ROTATION = '-r';
 
 module.exports.KINDLE_OPTIMIZED = '-k';
 
-module.exports.KM_INITIALIZATION_VECTOR = '\x61\x35\x65\x38\x65\x32\x65\x39\x63\x32\x37\x32\x31\x62\x65\x30\x61\x38\x34\x61\x64\x36\x36\x30\x63\x34\x37\x32\x63\x31\x66\x33';
+module.exports.KM_IV_FILE_NAME = './km_iv.txt';
+
+module.exports.WRAP_KM_KEY_FILE_NAME = './wrap_km_key.txt';
+
+module.exports.KM_IV = fs.readFileSync(this.KM_IV_FILE_NAME).toString(); // '\x61\x35\x65\x38\x65\x32\x65\x39\x63\x32\x37\x32\x31\x62\x65\x30\x61\x38\x34\x61\x64\x36\x36\x30\x63\x34\x37\x32\x63\x31\x66\x33';
+
+module.exports.WRAP_KM_KEY = fs.readFileSync(this.WRAP_KM_KEY_FILE_NAME).toString(); // '\x6E\x73\x66\x64\x37\x33\x32\x6E\x73\x64\x6E\x64\x73\x38\x32\x33\x6E\x73\x64\x66';
+
+module.exports.reloadIv = () => {
+    this.KM_IV = fs.readFileSync(this.KM_IV_FILE_NAME).toString();
+};
 
 module.exports.NULL_ARG = () => {
     return (new Date()).getTime(); 

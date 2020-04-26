@@ -8,15 +8,17 @@ const helper = require('./helper')
 
 const loURL = 'https://kissmanga.com/Scripts/lo.js';
 
-const kmPageImgLinksRegex = /lstImages\.push\(wrapKA\(\"(.*)\"\)\);/; 
-const kmWrapKAKeyRegex = /var\s+\_0x336e\s+\=\s+\[\"(.*)\"\]\;\s+chko\s+\=\s+_0x336e\[0\];\s+key\s\=\s+CryptoJS.SHA256\(chko\)/;
+const kmPageImgLinksRegex = /\.push\(wrapKA\(\"(.*)\"\)\);/; 
+// const kmWrapKAKeyRegex = /var\s+\_0x336e\s+\=\s+\[\"(.*)\"\]\;\s+chko\s+\=\s+_0x336e\[0\];\s+key\s\=\s+CryptoJS.SHA256\(chko\)/;
 
 // Function to capture and store all the relevant img links from KM link passed in
 let capturePageImageLinks = async (url, writeToFile = false, outputFileName = helper.DEFAULT_IMG_SRC, callback = null) => {
     // Open url in headless browser and wait for cloudflare DDOS protection to pass
     await cloudscraper.get(url).then((response) => {
-        // Retrieve the WrapKA Key from the response body
-        let wrapKAKey = response.match(kmWrapKAKeyRegex)[1];
+        // Retrieve the WrapKA Key from the response body -- Deprecated
+        /* let wrapKAKeyResponse = response.match(kmWrapKAKeyRegex);
+        let wrapKAKey = (wrapKAKeyResponse.length > 1) ? wrapKAKeyResponse[1] : helper.WRAP_KM_KEY */
+        
         // Retrieve all relevant img hashes from the response body
         let imgMatches = response.match(new RegExp(kmPageImgLinksRegex, 'g'));
         // From the img hashes previously retrieved, remove unnecessary text and return just img hash
@@ -25,7 +27,7 @@ let capturePageImageLinks = async (url, writeToFile = false, outputFileName = he
                                         if (link.length > 1) return link[1];
                                     });
         // Decode all img hashes and return the img download links
-        let imgLinks = wrapKM.decryptKMKeys(wrapKAKey, encodedStrs).join('\n');
+        let imgLinks = wrapKM.decryptKMKeys(encodedStrs).join('\n');
         console.log('Successfully retrieved image links');
         // If user wants the links written to a file then generate the file, else print to console
         if (writeToFile) {
@@ -40,12 +42,14 @@ let capturePageImageLinks = async (url, writeToFile = false, outputFileName = he
 };
 // Function to query ${loURL} and retrieve all relevant variables to be verified
 module.exports.checkAndUpdateKMVariables = async () => {
+    let ivUpdated = false;
     await cloudscraper.get(loURL).then((response) => {
         let loVars = response.match(/var\s+\_0x331e\=\[(.*)\];\(function\(\_0xfac5x1/);
         if (loVars.length > 1) 
-            loVar = loVars[1].split(',');
-        wrapKM.decryptAndUpdateLoVars(loVars);
+            loVars = loVars[1].split(',');
+            ivUpdated = wrapKM.decryptAndUpdateLoVars(loVars);
     }, console.error);
+    return ivUpdated;
 };
 // Export function to be invoked when page_scraper is imported into another file
 module.exports.getImageLinks = async (url, outputFileName = helper.DEFAULT_IMG_SRC, callback = null) => {

@@ -8,7 +8,7 @@ const pageScraper = require('./page_scraper');
 
 const sysArgs = new Set(process.argv);
 
-let bulkDownloadErrorCleanUp = (errorDetected) => {
+let bulkDownloadErrorCleanUp = (errorDetected, url) => {
     if (!errorDetected) { // If no error was detected before set the errorDetected flag
         errorDetected = true;
         // Truncate and re-purpose urls.txt file and use it to store the failed urls
@@ -43,13 +43,13 @@ let bulkDownload = () => {
         // On stderr "data" callback print data to console
         cmd.stderr.on("data", (data) => {
             failedUrls.push(url); // Increment failedUrls for logging purposes
-            errorDetected = bulkDownloadErrorCleanUp(errorDetected);
+            errorDetected = bulkDownloadErrorCleanUp(errorDetected, url);
             console.log(`Process ${cmd.pid} stderr: ${data}`);
         });
         // On error callback print data to console
         cmd.on('error', (error) => {
             failedUrls.push(url); // Increment failedUrls for logging purposes
-            errorDetected = bulkDownloadErrorCleanUp(errorDetected);
+            errorDetected = bulkDownloadErrorCleanUp(errorDetected, url);
             console.log(`error: ${error.message}`);
         });
 
@@ -72,12 +72,13 @@ let bulkDownload = () => {
 };
 
 module.exports.initBulkDownload = async () => {
+    let ivUpdated = await pageScraper.checkAndUpdateKMVariables();
+    if (ivUpdated) helper.reloadIv();
     await bulkDownload();
 };
 
 if (typeof require != 'undefined' && require.main == module) {
     (async () => {
-        await pageScraper.checkAndUpdateKMVariables();
         await this.initBulkDownload();
     })();
 }
