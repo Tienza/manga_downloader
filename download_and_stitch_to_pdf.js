@@ -1,6 +1,6 @@
 'use strict'
 
-const pageScraper = require('./page_scraper');
+const puppeteerScraper = require('./puppeteer_scrape');
 const imgDownloader = require('./webpage_image_downloader');
 const pdfWriter = require('./stitch_to_pdf');
 const helper = require('./helper');
@@ -21,7 +21,7 @@ if (typeof require != 'undefined' && require.main == module) {
      * 2. Initialize the download of all img(s) in the img source file and store in /temp
      * 3. Find all the relevant imgs in /temp and stitch into a PDF file named ${outputFileName}
     **/
-    pageScraper.getImageLinks(url, imgSrcFileName, 
+    puppeteerScraper.getImageLinks(url, imgSrcFileName, 
         () => imgDownloader.initDownloadAll(imgSrcFileName, 
             () => pdfWriter.initStitchToPdf(imgSrcFileName, outputFileName)));
 }

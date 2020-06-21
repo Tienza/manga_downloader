@@ -1,31 +1,36 @@
 {
-  "name": "kiss_manga_downloader",
-  "version": "1.0.0",
-  "description": "Keep track and download your favorite manga from KissManga to PDFs. Optional Kindle and Kindle PaperWhite Optimization and forced rotation of pages.",
-  "main": "manga_tracker.js",
-  "dependencies": {
-    "cloudscraper": "^4.6.0",
-    "crypto-js": "^4.0.0",
-    "follow-redirects": "^1.11.0",
-    "pdfkit": "^0.10.0",
-    "request": "^2.88.2"
-  },
-  "devDependencies": {},
-  "scripts": {
-    "test": "node manga_tracker.js -r -k"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/Tienza/kiss_manga_downloader.git"
-  },
-  "keywords": [
-    "KissManga",
-    "Downloader"
-  ],
-  "author": "Piradon (Tien) Liengtiraphan",
-  "license": "ISC",
-  "bugs": {
-    "url": "https://github.com/Tienza/kiss_manga_downloader/issues"
-  },
-  "homepage": "https://github.com/Tienza/kiss_manga_downloader#readme"
+    "name": "kiss_manga_downloader",
+    "version": "1.0.0",
+    "description": "Keep track and download your favorite manga from KissManga to PDFs. Optional Kindle and Kindle PaperWhite Optimization and forced rotation of pages.",
+    "main": "manga_tracker.js",
+    "dependencies": {
+        "cheerio": "^1.0.0-rc.3",
+        "cloudscraper": "^4.6.0",
+        "crypto-js": "^4.0.0",
+        "follow-redirects": "^1.11.0",
+        "got": "^11.3.0",
+        "hooman": "^1.2.5",
+        "httpdispatcher": "^2.1.2",
+        "pdfkit": "^0.10.0",
+        "puppeteer": "^4.0.0",
+        "request": "^2.88.2"
+    },
+    "devDependencies": {},
+    "scripts": {
+        "test": "node manga_tracker.js -r -k"
+    },
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/Tienza/kiss_manga_downloader.git"
+    },
+    "keywords": [
+        "KissManga",
+        "Downloader"
+    ],
+    "author": "Piradon (Tien) Liengtiraphan",
+    "license": "ISC",
+    "bugs": {
+        "url": "https://github.com/Tienza/kiss_manga_downloader/issues"
+    },
+    "homepage": "https://github.com/Tienza/kiss_manga_downloader#readme"
 }

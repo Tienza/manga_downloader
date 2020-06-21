@@ -4,7 +4,6 @@ const cp = require('child_process');
 const fs = require('fs');
 
 const helper = require('./helper');
-const pageScraper = require('./page_scraper');
 
 const sysArgs = new Set(process.argv);
 
@@ -35,7 +34,7 @@ let bulkDownload = () => {
     for (let url of URLs) {
         let r = (sysArgs.has(helper.FORCE_ROTATION)) ? helper.FORCE_ROTATION : helper.NULL_ARG();
         let k = (sysArgs.has(helper.KINDLE_OPTIMIZED)) ? helper.KINDLE_OPTIMIZED : helper.NULL_ARG();
-        let cmd = cp.spawn('nodejs', ['download_and_stitch_to_pdf.js', r, k, url]);
+        let cmd = cp.spawn('node', ['download_and_stitch_to_pdf.js', r, k, url]);
         // On stdout "data" callback print data to console
         cmd.stdout.on("data", (data) => {
             console.log(`Process ${cmd.pid} stdout: ${data}`);
@@ -72,8 +71,6 @@ let bulkDownload = () => {
 };
 
 module.exports.initBulkDownload = async () => {
-    let ivUpdated = await pageScraper.checkAndUpdateKMVariables();
-    if (ivUpdated) helper.reloadIv();
     await bulkDownload();
 };
 

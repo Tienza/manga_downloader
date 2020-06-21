@@ -1,7 +1,7 @@
 'use strict'
 
-const cloudscraper = require('cloudscraper');
 const fs = require('fs');
+const hooman = require('hooman');
 
 const bulkDownloader = require('./bulk_manga_downloader');
 const helper = require('./helper');
@@ -37,8 +37,9 @@ const setDiff = (a, b) => {
         let currManga = trackedManga[mangaName];
         // Check to see if the status of the manga is pau
         if (currManga.paused === undefined || currManga.paused === null || !currManga.paused) {
-            // Open the manga url in a headless browser
-            await cloudscraper.get(kmLinkPrefix + mangaName).then((response) => {
+            try { // Open the manga url in a headless browser - assign to response object
+                let hoomanResponse = await hooman.get(kmLinkPrefix + mangaName);
+                let response = hoomanResponse.body;
                 // Retrieve the manga's current status from the response body
                 let mangaStatus = response.match(statusRegex);
                 // Assign the status to a variable, if no status found then assume Ongoing
@@ -68,8 +69,10 @@ const setDiff = (a, b) => {
                     console.log(`${mangaName}: All Caught Up! | Status: ${status}`);
                 }
                 // If a manga's status has been marked as Completed then store the manga's name
-                if (status === helper.STATUS_COMPLETED) completedManga.push(mangaName)
-            }, console.error);
+                if (status === helper.STATUS_COMPLETED) completedManga.push(mangaName);
+            } catch (error) {
+                console.log(error.response.body);
+            }
         } else {
             console.log(`${mangaName}: Paused | Skipping...`);
         }
