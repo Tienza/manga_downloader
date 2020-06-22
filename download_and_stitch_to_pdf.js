@@ -1,6 +1,6 @@
 'use strict'
 
-const puppeteerScraper = require('./puppeteer_scrape');
+const puppeteerScraper = require('./puppeteer_scraper');
 const imgDownloader = require('./webpage_image_downloader');
 const pdfWriter = require('./stitch_to_pdf');
 const helper = require('./helper');

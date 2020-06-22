@@ -16,9 +16,12 @@ async function getPageBody(url, prom, options) {
     let type;
     let gotoOptions = {}; //currently unused
     if (options) {
-        if (options.waitTime && parseInt(options.waitTime)) waitTime = parseInt(options.waitTime)
-        if (options.type) type = options.type;
-        if (options.referer) gotoOptions.referer = options.referer;
+        if (options.waitTime && parseInt(options.waitTime)) 
+            waitTime = parseInt(options.waitTime);
+        if (options.type) 
+            type = options.type;
+        if (options.referer) 
+            gotoOptions.referer = options.referer;
     }
     try {
         const page = await browser.newPage();
@@ -33,30 +36,30 @@ async function getPageBody(url, prom, options) {
                 req.continue();
             }
         })
-        let gotoUrl = url
-        await page.goto(gotoUrl)
+        let gotoUrl = url;
+        await page.goto(gotoUrl);
         await page.waitFor(waitTime);
         var bodyHandle = await page.$('body');
         var html = await page.evaluate(body => body.innerHTML, bodyHandle);
         if (type === "cloudflare" && html.indexOf(`<p data-translate="process_is_automatic">This process is automatic. Your browser will redirect to your requested content shortly.</p>`) !== -1) {
-            console.log("Cloudflare detected - waiting")
-            await page.waitFor(5200)
+            console.log("Cloudflare detected - waiting");
+            await page.waitFor(5200);
             bodyHandle = await page.$('body');
             html = await page.evaluate(body => body.innerHTML, bodyHandle);
         }
         if (gotoUrl.indexOf("kissmanga") !== -1 && html.indexOf(`<form action="/Special/AreYouHuman2" id="formVerify1" method="post">`) !== -1) {
-            console.log("KM Captcha reload")
-            await page.goto(gotoUrl) //go to the URL again, to go around the captcha
-            await page.waitFor(500)
+            console.log("KM Captcha reload");
+            await page.goto(gotoUrl); //go to the URL again, to go around the captcha
+            await page.waitFor(500);
             bodyHandle = await page.$('body');
             html = await page.evaluate(body => body.innerHTML, bodyHandle);
         }
-        await page.close()
-        return prom(html)
+        await page.close();
+        return prom(html);
     }
     catch (e) {
-        console.log(e)
-        return prom(null)
+        console.log(e);
+        return prom(null);
     }
 }
 
@@ -79,7 +82,8 @@ let getKMImageLinks = async (url, writeToFile = false, outputFileName = helper.D
         let imgMatches = pageHTML.match(new RegExp(IMG_REGEX, 'g'));
         let imgLinks = imgMatches.map((currVal) => {
             let link = currVal.match(IMG_REGEX);
-            if (link.length > 1) return link[1];
+            if (link.length > 1) 
+                return link[1];
         });
         console.log('Successfully retrieved image links');
         fs.writeFileSync(outputFileName, imgLinks.join('\n'));
@@ -90,7 +94,7 @@ let getKMImageLinks = async (url, writeToFile = false, outputFileName = helper.D
         if (callback) callback();
     } else {
         console.log("Returned HTML was not what we wanted. Printing the HTML in five seconds for debugging: ")
-        setTimeout(function () { console.log(pageHTML) }, 5000)
+        setTimeout(() => { console.log(pageHTML) }, 5000);
     }
 }
 

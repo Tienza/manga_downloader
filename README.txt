@@ -33,4 +33,4 @@ TRACK MULTIPLE MANGA AND BULK DOWNLOAD
   • nodejs manga_tracker.js [-r|-k|-u]
     • -r Please see above description
     • -k Please see above description
-    • -u Update mode ONLY, with this option not downloads will occur, but the program will fetch and update tracked_manga.json with all the available chapter links (or up to limit if set)
+    • -u Update mode ONLY, with this option no downloads will occur, but the program will fetch and update tracked_manga.json with all the available chapter links (or up to limit if set)

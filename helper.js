@@ -16,10 +16,6 @@ module.exports.FORCE_ROTATION = '-r';
 
 module.exports.KINDLE_OPTIMIZED = '-k';
 
-module.exports.WRAP_KM_KEY_FILE_NAME = './wrap_km_key.txt';
-
-module.exports.WRAP_KM_KEY = fs.readFileSync(this.WRAP_KM_KEY_FILE_NAME).toString(); // '\x6E\x73\x66\x64\x37\x33\x32\x6E\x73\x64\x6E\x64\x73\x38\x32\x33\x6E\x73\x64\x66';
-
 module.exports.NULL_ARG = () => {
     return (new Date()).getTime(); 
 }
