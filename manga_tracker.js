@@ -53,7 +53,7 @@ const setDiff = (a, b) => {
                 // If the number of chapters found in the obj and the response body don't match 
                 if (currManga.tracked.length !== totalChapters.length) {
                     updatedNeeded = true; // Flag that the manage has been updated
-                    console.log(`${mangaName}: Missing ${totalChapters.length - currManga.tracked.length} Chapter(s)| Download Limit: ${(currManga.limit !== undefined && currManga.limit !== null) ? currManga.limit : 'null'} | Status: ${status}`);
+                    console.log(`${mangaName}: Missing ${totalChapters.length - currManga.tracked.length} Chapter(s) | Download Limit: ${(currManga.limit !== undefined && currManga.limit !== null) ? currManga.limit : 'null'} | Status: ${status}`);
                     // From all the chapter links, filter out the ones we currently do not track
                     let missingChapterLinks = setDiff(totalChapters, new Set(currManga.tracked));
                     // Check if a limit has been set filter out the missingLinks again

@@ -41,14 +41,14 @@ async function getPageBody(url, prom, options) {
         await page.waitFor(waitTime);
         var bodyHandle = await page.$('body');
         var html = await page.evaluate(body => body.innerHTML, bodyHandle);
-        if (type === "cloudflare" && html.indexOf(`<p data-translate="process_is_automatic">This process is automatic. Your browser will redirect to your requested content shortly.</p>`) !== -1) {
-            console.log("Cloudflare detected - waiting");
+        if (type === 'cloudflare' && html.indexOf('<p data-translate="process_is_automatic">This process is automatic. Your browser will redirect to your requested content shortly.</p>') !== -1) {
+            console.log('Cloudflare detected - waiting');
             await page.waitFor(5200);
             bodyHandle = await page.$('body');
             html = await page.evaluate(body => body.innerHTML, bodyHandle);
         }
-        if (gotoUrl.indexOf("kissmanga") !== -1 && html.indexOf(`<form action="/Special/AreYouHuman2" id="formVerify1" method="post">`) !== -1) {
-            console.log("KM Captcha reload");
+        if (gotoUrl.indexOf('kissmanga') !== -1 && html.indexOf('<form action="/Special/AreYouHuman2" id="formVerify1" method="post">') !== -1) {
+            console.log('KM Captcha reload');
             await page.goto(gotoUrl); //go to the URL again, to go around the captcha
             await page.waitFor(500);
             bodyHandle = await page.$('body');
@@ -74,11 +74,11 @@ let getKMImageLinks = async (url, writeToFile = false, outputFileName = helper.D
     // Initialize headless browser
     browser = await puppeteer.launch();
     // Declare a new promise to wait for
-    let promise = new Promise((prom, reject) => getPageBody(url, prom, { type: "cloudflare" }));
+    let promise = new Promise((prom, reject) => getPageBody(url, prom, {type: 'cloudflare'}));
     // Once promise is returned serve and assign to variable to further processing
     let pageHTML = await promise; //there you go
     if (pageHTML.indexOf('push(wrapKA') !== -1) {
-        console.log("Manga page loaded successfully! Retrieving image links");
+        console.log('Manga page loaded successfully! Retrieving image links');
         let imgMatches = pageHTML.match(new RegExp(IMG_REGEX, 'g'));
         let imgLinks = imgMatches.map((currVal) => {
             let link = currVal.match(IMG_REGEX);
@@ -93,7 +93,7 @@ let getKMImageLinks = async (url, writeToFile = false, outputFileName = helper.D
         // If there is a callback invoke it next
         if (callback) callback();
     } else {
-        console.log("Returned HTML was not what we wanted. Printing the HTML in five seconds for debugging: ")
+        console.log('Returned HTML was not what we wanted. Printing the HTML in five seconds for debugging: ')
         setTimeout(() => { console.log(pageHTML) }, 5000);
     }
 }

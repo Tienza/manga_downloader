@@ -1,7 +1,7 @@
 DOWNLOAD AND CONVERT ONE MANGA FROM URL
 
 1. To download and convert individual Manga to PDF invoke the following command
-  • nodejs download_and_stitch_to_pdf.js [-r|-k] <KissManga_link> (e.g. https://kissmanga.com/Manga/Grand-Blue/Vol-001-Ch-001--Deep-Blue?id=304809)
+  • node download_and_stitch_to_pdf.js [-r|-k] <KissManga_link> (e.g. https://kissmanga.com/Manga/Grand-Blue/Vol-001-Ch-001--Deep-Blue?id=304809)
   • -r Enables forced rotation mode. All landscape images will be rotated into portrait mode (optimized for Kindle Readers)
   • -k Enables kindle optimization mode. All images that have lengths and widths that are too large for Kindle Paperwhite are scaled down to a manageable size, proportional to the size of the page.
 
@@ -30,7 +30,7 @@ TRACK MULTIPLE MANGA AND BULK DOWNLOAD
   • "paused": Boolean to determine whether to progress with the tracking of said manga or not. If it is true, the program will skip the manga.
 
 2. Invoke the following command to begin the tracking and downloading process
-  • nodejs manga_tracker.js [-r|-k|-u]
+  • node manga_tracker.js [-r|-k|-u]
     • -r Please see above description
     • -k Please see above description
     • -u Update mode ONLY, with this option no downloads will occur, but the program will fetch and update tracked_manga.json with all the available chapter links (or up to limit if set)
