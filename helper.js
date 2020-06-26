@@ -54,6 +54,20 @@ module.exports.fileNameFromKmURL = (url) => {
     console.log(`Output file name generated from URL: '${suggestedTitle}'`);
     return suggestedTitle;
 };
+// Generate file name using elements from the URL that was passed in - Assume Mangakakalots
+module.exports.fileNameFromMkkURL = (url) => {
+    // Split the URL on /
+    let urlSplit = url.split('/');
+    // Grab the manga name
+    let mangaName = (urlSplit.length > 1) ? urlSplit[urlSplit.length - 2] : 'MangaName';
+    // Grab the chapter/title
+    let chapter = (urlSplit.length > 0) ? urlSplit[urlSplit.length - 1] : '000';
+    // Append the manga name and chapter/title in pre-defined order and set extension to .pdf
+    let suggestedTitle = `${mangaName} ${chapter}.pdf`.replace(/[\-\s+]+/g, ' ');
+    suggestedTitle = suggestedTitle.replace(/\s+/g, '_');
+    console.log(`Output file name generated from URL: '${suggestedTitle}'`);
+    return suggestedTitle;
+};
 // Append .img_sources.txt to denote image source file for in-progress manga
 module.exports.imgSrcFileNameGenerator = (fileName) => {
     return fileName + '.img_sources.txt';

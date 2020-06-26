@@ -10,7 +10,7 @@ const readLine = require('readline').createInterface({
 const helper = require('./helper');
 
 const sysArgs = process.argv;
-const validTitleRegEx = /^[a-zA-Z0-9_\s\(\)]+.?p?d?f?$/;
+const validTitleRegEx = /^[a-zA-Z0-9_\s\(\)\.]+.?p?d?f?$/;
 
 const tempDir = './temp';
 const outputDir = './output';
@@ -242,5 +242,8 @@ module.exports.initStitchToPdf = (imgPathFileName = null, autoGenOutputFileName 
 }
 
 if (typeof require != 'undefined' && require.main == module) {
-    this.initStitchToPdf();
+    let fileName = sysArgs[2].split('.');
+    fileName.pop();
+    fileName.pop();
+    this.initStitchToPdf(sysArgs[2], fileName.join('.'));
 }

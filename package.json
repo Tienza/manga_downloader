@@ -5,14 +5,12 @@
     "main": "manga_tracker.js",
     "dependencies": {
         "cheerio": "^1.0.0-rc.3",
-        "cloudscraper": "^4.6.0",
         "crypto-js": "^4.0.0",
         "follow-redirects": "^1.11.0",
         "got": "^11.3.0",
         "hooman": "^1.2.5",
         "httpdispatcher": "^2.1.2",
         "pdfkit": "^0.10.0",
-        "puppeteer": "^4.0.0",
         "request": "^2.88.2"
     },
     "devDependencies": {},

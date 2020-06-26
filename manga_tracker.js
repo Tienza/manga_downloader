@@ -8,6 +8,12 @@ const helper = require('./helper');
 
 const sysArgs = new Set(process.argv);
 
+
+const MKK_PREFIX = 'https://ww1.mangakakalots.com';
+const MKK_MANGA_LINK_PREFIX = MKK_PREFIX + '/manga/';
+const MKK_MANGA_STATUS_REGEX = /\<li\>Status\s\:\s(.*?)\<\/li\>/;
+const MKK_MANGA_CHAPTER_URL_REGEX = /\<div\sclass\=\"row\"\>\s+\<span\>\<a\shref\=\"(.*)\"\s+title\=\".*\>/;
+
 const chapterLinkRegex = /\<td\>\s+\<a\shref\=\"(.*)\"\stitle\=\".*\"\>\s+.*\s+\<\/td\>/;
 const statusRegex = /\<span\sclass\=\"info\"\>Status\:\<\/span\>&nbsp\;(\w+)\n+/;
 const kmPrefix = 'https://kissmanga.com';
@@ -38,18 +44,18 @@ const setDiff = (a, b) => {
         // Check to see if the status of the manga is pau
         if (currManga.paused === undefined || currManga.paused === null || !currManga.paused) {
             try { // Open the manga url in a headless browser - assign to response object
-                let hoomanResponse = await hooman.get(kmLinkPrefix + mangaName);
+                let hoomanResponse = await hooman.get(MKK_MANGA_LINK_PREFIX + currManga.urlKey);
                 let response = hoomanResponse.body;
                 // Retrieve the manga's current status from the response body
-                let mangaStatus = response.match(statusRegex);
+                let mangaStatus = response.match(MKK_MANGA_STATUS_REGEX);
                 // Assign the status to a variable, if no status found then assume Ongoing
                 let status = (mangaStatus.length > 1) ? mangaStatus[1].trim() : helper.STATUS_ONGOING;
                 // Retrieve all chapter links from the response body
-                let totalChapters = response.match(new RegExp(chapterLinkRegex, 'g'))
-                                            .map((currVal) => {
-                                                let chapter = currVal.match(chapterLinkRegex);
-                                                if (chapter.length > 1) return chapter[1];
-                                            });
+                let totalChapters = response.match(new RegExp(MKK_MANGA_CHAPTER_URL_REGEX, 'g'))
+                    .map((currVal) => {
+                        let chapter = currVal.match(MKK_MANGA_CHAPTER_URL_REGEX);
+                        if (chapter.length > 1) return chapter[1];
+                    });
                 // If the number of chapters found in the obj and the response body don't match 
                 if (currManga.tracked.length !== totalChapters.length) {
                     updatedNeeded = true; // Flag that the manage has been updated
@@ -63,8 +69,8 @@ const setDiff = (a, b) => {
                     // Update tracked_manga object
                     currManga.tracked = (currManga.limit === undefined || currManga.limit === null) ? totalChapters : missingChapterLinks.concat(currManga.tracked);
                     // Append all the links that need to be downloaded to urls.txt
-                    fs.appendFileSync(helper.URLS_FILE_NAME, 
-                        missingChapterLinks.map((currVal) => kmPrefix + currVal).join('\n') + '\n');
+                    fs.appendFileSync(helper.URLS_FILE_NAME,
+                        missingChapterLinks.map((url) => MKK_PREFIX + url).join('\n') + '\n');
                 } else { // Otherwise no updates nee to be performed
                     console.log(`${mangaName}: All Caught Up! | Status: ${status}`);
                 }

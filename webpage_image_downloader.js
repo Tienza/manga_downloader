@@ -52,7 +52,9 @@ let downloadAll = (srcArr, imgSrcFileName = '', callback) => {
                 console.log(`Overwriting ${imgSrcFileName} with file paths...`);
                 fs.writeFileSync(imgSrcFileName, downloadedImgPaths.join('\n'));
                 // Invoke the callback function is not null
-                if (callback) callback();
+                if (callback) {
+                    callback();
+                }
             }
         });
     }

@@ -1,6 +1,6 @@
 'use strict'
 
-const puppeteerScraper = require('./puppeteer_scraper');
+const mangakakalotScraper = require('./mangakakalot_scraper');
 const imgDownloader = require('./webpage_image_downloader');
 const pdfWriter = require('./stitch_to_pdf');
 const helper = require('./helper');
@@ -12,7 +12,7 @@ if (typeof require != 'undefined' && require.main == module) {
     // Run through the arguments passed into see if there is a valid url - should only be at most 1
     let url = sysArgs.filter((currVal) => helper.validURL(currVal))[0];
     // From the URL passed in generate the output file name
-    let outputFileName = helper.fileNameFromKmURL(url);
+    let outputFileName = helper.fileNameFromMangakaURL(url);
     // Using the outputFileName generated, generate the img source file name
     let imgSrcFileName = helper.imgSrcFileNameGenerator(outputFileName);
     /* 
@@ -21,7 +21,7 @@ if (typeof require != 'undefined' && require.main == module) {
      * 2. Initialize the download of all img(s) in the img source file and store in /temp
      * 3. Find all the relevant imgs in /temp and stitch into a PDF file named ${outputFileName}
     **/
-    puppeteerScraper.getImageLinks(url, imgSrcFileName, 
+   mangakakalotScraper.getImageLinks(url, imgSrcFileName, 
         () => imgDownloader.initDownloadAll(imgSrcFileName, 
             () => pdfWriter.initStitchToPdf(imgSrcFileName, outputFileName)));
 }
