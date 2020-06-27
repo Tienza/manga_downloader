@@ -12,7 +12,7 @@ if (typeof require != 'undefined' && require.main == module) {
     // Run through the arguments passed into see if there is a valid url - should only be at most 1
     let url = sysArgs.filter((currVal) => helper.validURL(currVal))[0];
     // From the URL passed in generate the output file name
-    let outputFileName = helper.fileNameFromMangakaURL(url);
+    let outputFileName = helper.fileNameFromMkkURL(url);
     // Using the outputFileName generated, generate the img source file name
     let imgSrcFileName = helper.imgSrcFileNameGenerator(outputFileName);
     /* 
