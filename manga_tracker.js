@@ -29,9 +29,13 @@ const setDiff = (a, b) => {
     if (!fs.existsSync(helper.URLS_FILE_NAME)) {
         fs.writeFileSync(helper.URLS_FILE_NAME, '');
     }
-    // If the tracked_manga.json doesn't exit, then create it
+    // If the tracked_manga.json doesn't exist, then create it
     if (!fs.existsSync(helper.TRACKED_MANGA_FILE_NAME)) {
         fs.writeFileSync(helper.TRACKED_MANGA_FILE_NAME, '{}');
+    }
+    // If the title_mapper.json doesn't exist, then create it
+    if (!fs.existsSync(helper.TITLE_MAPPER_FILE_NAME)) {
+        fs.writeFileSync(helper.TITLE_MAPPER_FILE_NAME, '{}');
     }
     // Set initial run variables
     let updatedNeeded = false;
@@ -94,6 +98,15 @@ const setDiff = (a, b) => {
     // Persist the new tracked_manga object for the next run
     fs.writeFileSync(helper.TRACKED_MANGA_FILE_NAME, JSON.stringify(trackedManga));
     console.log('Tracking File Updated');
+    // Update the title_mapper
+    console.log('Building title_mapper.json');
+    let titleMapper = {};
+    for (let mangaName in trackedManga) {
+        titleMapper[trackedManga[mangaName].urlKey] = mangaName;
+    }
+    // Persist to title_mapper.json file for next steps
+    fs.writeFileSync(helper.TITLE_MAPPER_FILE_NAME, JSON.stringify(titleMapper));
+    console.log('Title Mapper Updated');
     // Determine what the necessary next steps are...
     if (updatedNeeded && !sysArgs.has('-u')) { // Normal run, initiate the bulk_download process
         await bulkDownloader.initBulkDownload();

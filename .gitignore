@@ -2,3 +2,5 @@
 temp/
 output/
 node_modules/
+tracked_manga.json
+title_mapper.json

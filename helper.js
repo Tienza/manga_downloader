@@ -8,6 +8,8 @@ module.exports.URLS_FILE_NAME = './urls.txt';
 
 module.exports.TRACKED_MANGA_FILE_NAME = './tracked_manga.json';
 
+module.exports.TITLE_MAPPER_FILE_NAME = './title_mapper.json'
+
 module.exports.STATUS_ONGOING = 'Ongoing';
 
 module.exports.STATUS_COMPLETED = 'Completed';
@@ -50,16 +52,19 @@ module.exports.fileNameFromKmURL = (url) => {
     let chapter = (urlSplit.length > 0) ? urlSplit[urlSplit.length - 1].split('?')[0] : '000';
     // Append the manga name and chapter/title in pre-defined order and set extension to .pdf
     let suggestedTitle = `${mangaName} ${chapter}.pdf`.replace(/[\-\s+]+/g, ' ');
-    suggestedTitle = suggestedTitle.replace(/\s+/g, '_');
+    suggestedTitle = suggestedTitle.replace(/\s+/g, '_').toLowerCase();
     console.log(`Output file name generated from URL: '${suggestedTitle}'`);
     return suggestedTitle;
 };
 // Generate file name using elements from the URL that was passed in - Assume Mangakakalots
 module.exports.fileNameFromMkkURL = (url) => {
+    // Read title_mapper.json to use for output file name generation
+    let titleMapper = JSON.parse(fs.readFileSync(this.TITLE_MAPPER_FILE_NAME).toString());
     // Split the URL on /
     let urlSplit = url.split('/');
     // Grab the manga name
-    let mangaName = (urlSplit.length > 1) ? urlSplit[urlSplit.length - 2] : 'MangaName';
+    let mangaName = (urlSplit.length > 1 && titleMapper[urlSplit[urlSplit.length - 2]] 
+        !== undefined) ? titleMapper[urlSplit[urlSplit.length - 2]] : 'MangaName';
     // Grab the chapter/title
     let chapter = (urlSplit.length > 0) ? urlSplit[urlSplit.length - 1] : '000';
     // Append the manga name and chapter/title in pre-defined order and set extension to .pdf
