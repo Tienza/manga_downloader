@@ -18,6 +18,7 @@ module.exports.FORCE_ROTATION = '-r';
 
 module.exports.KINDLE_OPTIMIZED = '-k';
 
+// Generate a random time stamp to be passed into the arguments list so that it's ignored
 module.exports.NULL_ARG = () => {
     return (new Date()).getTime(); 
 }
@@ -63,8 +64,14 @@ module.exports.fileNameFromMkkURL = (url) => {
     // Split the URL on /
     let urlSplit = url.split('/');
     // Grab the manga name
-    let mangaName = (urlSplit.length > 1 && titleMapper[urlSplit[urlSplit.length - 2]] 
-        !== undefined) ? titleMapper[urlSplit[urlSplit.length - 2]] : 'MangaName';
+    let mangaName = '';
+    if (urlSplit.length > 1 && titleMapper[urlSplit[urlSplit.length - 2]] !== undefined) {
+        mangaName = titleMapper[urlSplit[urlSplit.length - 2]];
+    }  else if (urlSplit.length > 1) {
+        mangaName = urlSplit[urlSplit.length - 2];
+    } else {
+        mangaName = 'MangaName';
+    }
     // Grab the chapter/title
     let chapter = (urlSplit.length > 0) ? urlSplit[urlSplit.length - 1] : '000';
     // Append the manga name and chapter/title in pre-defined order and set extension to .pdf
