@@ -7,14 +7,15 @@ const readLine = require('readline').createInterface({
     input: process.stdin,
     output: process.stdout
 });
+
 const helper = require('./helper');
 
 const sysArgs = process.argv;
 const validTitleRegEx = /^[a-zA-Z0-9_\s\(\)\.]+.?p?d?f?$/;
 
-const tempDir = './temp';
-const outputDir = './output';
-const defaultFileName = 'output.pdf';
+const tempDir = helper.TEMP_DIRECTORY_NAME;
+const outputDir = helper.OUTPUT_DIRECTORY_NAME;
+const defaultFileName = helper.DEFAULT_OUTPUT_FILE_NAME;
 
 const rotateRatio = 90;
 
@@ -60,7 +61,7 @@ let checkAndScale = (kindleOptimized, pageWidth, pageHeight) => {
         // Determine the orientation of the file-to-be-scaled, and scale accordingly
         if (pageWidth > pageHeight) {    
             pageWidth = (pageWidth > kindlePaperWhiteLong) ? kindlePaperWhiteLong : pageWidth;
-            pageHeight = (pageHeight > kindlePaperWhiteShort) ?  kindlePaperWhiteShort : pageHeight;
+            pageHeight = (pageHeight > kindlePaperWhiteShort) ? kindlePaperWhiteShort : pageHeight;
         } else {
             pageWidth = (pageWidth > kindlePaperWhiteShort) ? kindlePaperWhiteShort : pageWidth;
             pageHeight = (pageHeight > kindlePaperWhiteLong) ? kindlePaperWhiteLong : pageHeight;

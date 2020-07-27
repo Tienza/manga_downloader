@@ -2,6 +2,12 @@
 
 const fs = require('fs');
 
+module.exports.TEMP_DIRECTORY_NAME = './temp';
+
+module.exports.OUTPUT_DIRECTORY_NAME = './output';
+
+module.exports.DEFAULT_OUTPUT_FILE_NAME = 'output.pdf';
+
 module.exports.DEFAULT_IMG_SRC = './img_sources.txt';
 
 module.exports.URLS_FILE_NAME = './urls.txt';

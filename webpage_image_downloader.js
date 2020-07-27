@@ -4,8 +4,10 @@ const fs = require('fs');
 const path = require('path');
 const request = require('request');
 
-const tempDir = './temp';
-const inputFileName = 'img_sources.txt';
+const helper = require('./helper');
+
+const tempDir = helper.TEMP_DIRECTORY_NAME;
+const inputFileName = helper.DEFAULT_IMG_SRC;
 
 let downloadFile = (uri, fileName, callback) => {
     request.head(uri, (err, res, body) => {
