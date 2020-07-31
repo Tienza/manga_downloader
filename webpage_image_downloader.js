@@ -40,7 +40,7 @@ let downloadAll = (srcArr, imgSrcFileName = '', callback) => {
         // From the img url extract the extension
         let extension = path.extname(imgURL);
         // Finalize the image location and name
-        let fileName = `${tempDir}/${imgSrcFileName}.${imgNum}${extension}`;
+        let fileName = path.join(tempDir, `${imgSrcFileName}.${imgNum}${extension}`);
         // Initialize download of image
         downloadFile(imgURL, fileName, () => {
             console.log('Finished Downloading: ' + fileName);

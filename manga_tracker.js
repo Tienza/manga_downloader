@@ -99,7 +99,7 @@ const setDiff = (a, b) => {
     fs.writeFileSync(helper.TRACKED_MANGA_FILE_NAME, JSON.stringify(trackedManga));
     console.log('Tracking File Updated');
     // Update the title_mapper
-    console.log('Building title_mapper.json');
+    console.log(`Building ${helper.TITLE_MAPPER_FILE_NAME}`);
     let titleMapper = {};
     for (let mangaName in trackedManga) {
         titleMapper[trackedManga[mangaName].urlKey] = mangaName;

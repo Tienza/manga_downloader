@@ -17,6 +17,8 @@ const tempDir = helper.TEMP_DIRECTORY_NAME;
 const outputDir = helper.OUTPUT_DIRECTORY_NAME;
 const defaultFileName = helper.DEFAULT_OUTPUT_FILE_NAME;
 
+const pdfExtension = '.pdf';
+
 const rotateRatio = 90;
 
 const kindlePaperWhiteLong = 1448;
@@ -26,11 +28,11 @@ let checkAndGenerateSysArgs = (sysArgs, autoGenOutputFileName = null) => {
     // Initialize default values for the system arguments
     let forceRotation = false;
     let kindleOptimized = false;
-    let outputFileName = (autoGenOutputFileName !== null) ? autoGenOutputFileName : defaultFileName;
+    let outputFileName = (autoGenOutputFileName !== null && autoGenOutputFileName !== '') ? autoGenOutputFileName : defaultFileName;
     let titleSuggested = false;
     // Check to see if the following optional parameters were passed in
-    forceRotation = (sysArgs.indexOf('-r') !== -1);
-    kindleOptimized = (sysArgs.indexOf('-k') !== -1);
+    forceRotation = (sysArgs.indexOf(helper.FORCE_ROTATION) !== -1);
+    kindleOptimized = (sysArgs.indexOf(helper.KINDLE_OPTIMIZED) !== -1);
     // Find the specified file name - which should always be the final argument that is passed in
     if (outputFileName === defaultFileName 
         && sysArgs[sysArgs.length - 1] && validTitleRegEx.test(sysArgs[sysArgs.length - 1])) {
@@ -57,22 +59,38 @@ let checkAndRotate = (forceRotation, doc, index, imgWidth, imgHeight) => {
 
 let checkAndScale = (kindleOptimized, pageWidth, pageHeight) => {
     // Scale down image if either the width or height of the image is larger Kindle Paper White Screen
-    if (kindleOptimized && (pageWidth > kindlePaperWhiteLong || pageHeight > kindlePaperWhiteShort)) {
+    if (kindleOptimized) {
+        let imageScaled = false;
         // Determine the orientation of the file-to-be-scaled, and scale accordingly
-        if (pageWidth > pageHeight) {    
-            pageWidth = (pageWidth > kindlePaperWhiteLong) ? kindlePaperWhiteLong : pageWidth;
-            pageHeight = (pageHeight > kindlePaperWhiteShort) ? kindlePaperWhiteShort : pageHeight;
-        } else {
-            pageWidth = (pageWidth > kindlePaperWhiteShort) ? kindlePaperWhiteShort : pageWidth;
-            pageHeight = (pageHeight > kindlePaperWhiteLong) ? kindlePaperWhiteLong : pageHeight;
+        if (pageWidth > pageHeight) { // Landscape
+            if (pageWidth > kindlePaperWhiteLong) {
+                pageWidth = kindlePaperWhiteLong;
+                imageScaled = true;
+            }
+            if (pageHeight > kindlePaperWhiteShort) {
+                pageHeight = kindlePaperWhiteShort;
+                imageScaled = true;
+            }
+        } else { // Portrait
+            if (pageWidth > kindlePaperWhiteShort) {
+                pageWidth = kindlePaperWhiteShort;
+                imageScaled = true;
+            }
+            if (pageHeight > kindlePaperWhiteLong) {
+                pageHeight = kindlePaperWhiteLong;
+                imageScaled = true;
+            }
         }
-        console.log('Image scaled down');
+        // If the image was scaled in anyway, then log the fact that it was
+        if (imageScaled) {
+            console.log('Image scaled down');
+        }
     }
     return { width: pageWidth, height: pageHeight };
 }
 
 let stitchToPdf = (imgPathFileName = helper.DEFAULT_IMG_SRC, forceRotation, kindleOptimized, fileName) => {
-    let outputFilePath = outputDir + '/' + fileName;
+    let outputFilePath = path.join(outputDir, fileName);
     // If the ./temp/ directory doesn't exit, then create it
     if (!fs.existsSync(tempDir)) {
         fs.mkdirSync(tempDir);
@@ -89,20 +107,20 @@ let stitchToPdf = (imgPathFileName = helper.DEFAULT_IMG_SRC, forceRotation, kind
     let doc = null;
     // Boolean for first pass setup
     let firstPass = true;
-    
+    // If and imgPathFileName has been passed, then read that file and store image paths
     if (imgPathFileName !== null) {
         let filePaths = fs.readFileSync(imgPathFileName).toString().trim().split(/\r?\n/);
         for (let index in filePaths) {
             imgPaths.push({fileName: filePaths[index], index: index});
         }
-    } else {
+    } else { // Else just read the temp directory in it's entirety (LEGACY Support)
         fs.readdir(tempDir, (err, files) => {
             if (err) { // If there is an error throw it and perform no action
                 throw err;
             } else { // Continue with output writing process
                 // Write the downloaded images to the output pdf file
                 files.forEach((file, index) => {
-                    imgPaths.push({fileName: tempDir + '/' + file, index: index});
+                    imgPaths.push({fileName: path.join(tempDir, file), index: index});
                 });
             }
         });
@@ -169,13 +187,13 @@ module.exports.initStitchToPdf = (imgPathFileName = null, autoGenOutputFileName 
     let forceRotation = argsObj.forceRotation;
     let kindleOptimized = argsObj.kindleOptimized;
     // Add file the file extension of .pdf to the end of the file if it was not originally provided
-    let fileName = (path.extname(argsObj.outputFileName) === '.pdf') ? argsObj.outputFileName : argsObj.outputFileName + '.pdf';
+    let fileName = (path.extname(argsObj.outputFileName) === pdfExtension) ? argsObj.outputFileName : argsObj.outputFileName + pdfExtension;
     // Print out the parameters that will be passed into the function to begin stitching the pdf together
     console.log('Forced Rotation Mode: ' + forceRotation);
     console.log('Kindle Optimization Mode: ' + kindleOptimized);
     console.log('Output File Name: ' + fileName);
     // Perform pre-operation checks on the file name that was passed in
-    let fileExists = fs.existsSync(outputDir + '/' + fileName);
+    let fileExists = fs.existsSync(path.join(outputDir, fileName));
     let invalidFileName = !validTitleRegEx.test(fileName);
     let defaultedFileName = (fileName === defaultFileName);
     // Check if the output file the user specified already exists or if the file name provided is invalid or if the name of the file was defaulted
@@ -192,8 +210,8 @@ module.exports.initStitchToPdf = (imgPathFileName = null, autoGenOutputFileName 
                 readLine.prompt();
                 readLine.on('line', (newFileName) => {
                     // Add .pdf extension to file - if necessary
-                    newFileName = (path.extname(newFileName) === '.pdf') ? newFileName : newFileName + '.pdf';
-                    if (validTitleRegEx.test(newFileName) && !fs.existsSync(outputDir + '/' + newFileName)) { // If new file name is valid proceed on
+                    newFileName = (path.extname(newFileName) === pdfExtension) ? newFileName : newFileName + pdfExtension;
+                    if (validTitleRegEx.test(newFileName) && !fs.existsSync(path.join(outputDir, newFileName))) { // If new file name is valid proceed on
                         // Set empty prompt and reprompt so there is not extra printed line of previous prompt
                         // Very Hacky Solution
                         readLine.setPrompt('');
