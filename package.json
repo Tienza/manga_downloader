@@ -1,16 +1,13 @@
 {
-    "name": "kiss_manga_downloader",
+    "name": "mangakakalot_downloader",
     "version": "1.0.0",
-    "description": "Keep track and download your favorite manga from KissManga to PDFs. Optional Kindle and Kindle PaperWhite Optimization and forced rotation of pages.",
+    "description": "Keep track of and download your favorite manga from Mangakakalot in PDF format. Optional Kindle and Kindle PaperWhite optimization and forced rotation of pages.",
     "main": "manga_tracker.js",
     "dependencies": {
-        "cheerio": "^1.0.0-rc.3",
         "crypto-js": "^4.0.0",
-        "follow-redirects": "^1.11.0",
-        "got": "^11.3.0",
+        "got": "^11.5.1",
         "hooman": "^1.2.5",
-        "httpdispatcher": "^2.1.2",
-        "pdfkit": "^0.10.0",
+        "pdfkit": "^0.11.0",
         "request": "^2.88.2"
     },
     "devDependencies": {},
@@ -19,16 +16,19 @@
     },
     "repository": {
         "type": "git",
-        "url": "git+https://github.com/Tienza/kiss_manga_downloader.git"
+        "url": "git+https://github.com/Tienza/mangakakalot_downloader.git"
     },
     "keywords": [
-        "KissManga",
-        "Downloader"
+        "Mangakakalot",
+        "Downloader",
+        "Node",
+        "PDF",
+        "JavaScript"
     ],
     "author": "Piradon (Tien) Liengtiraphan",
     "license": "ISC",
     "bugs": {
-        "url": "https://github.com/Tienza/kiss_manga_downloader/issues"
+        "url": "https://github.com/Tienza/mangakakalot_downloader/issues"
     },
-    "homepage": "https://github.com/Tienza/kiss_manga_downloader#readme"
+    "homepage": "https://github.com/Tienza/mangakakalot_downloader#readme"
 }
