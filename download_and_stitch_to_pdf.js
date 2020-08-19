@@ -23,6 +23,6 @@ if (typeof require != 'undefined' && require.main == module) {
      * 3. Find all the relevant imgs in /temp and stitch into a PDF file named ${outputFileName}
     **/
     mangakakalotScraper.getImageLinks(url, imgSrcFileName, 
-        () => imgDownloader.initDownloadAll(imgSrcFileName, 
+        () => imgDownloader.initDownloadAllFromFile(imgSrcFileName, 
             () => pdfWriter.initStitchToPdf(imgSrcFileName, outputFileName)));
 }

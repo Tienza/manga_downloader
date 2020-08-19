@@ -41,13 +41,19 @@ module.exports.hexToAscii = (hexStr) => {
 };
 // Determine if string passed in is a valid URL
 module.exports.validURL = (str) => {
-    let  pattern = new RegExp('^(https?:\\/\\/)?'+ // protocol
+    let pattern = new RegExp('^(https?:\\/\\/)?'+ // protocol
     '((([a-z\\d]([a-z\\d-]*[a-z\\d])*)\\.)+[a-z]{2,}|'+ // domain name
     '((\\d{1,3}\\.){3}\\d{1,3}))'+ // OR ip (v4) address
     '(\\:\\d+)?(\\/[-a-z\\d%_.~+]*)*'+ // port and path
     '(\\?[;&a-z\\d%_.~+=-]*)?'+ // query string
     '(\\#[-a-z\\d_]*)?$','i'); // fragment locator
     return !!pattern.test(str);
+};
+// Get domain from url
+module.exports.getDomainFromUrl = (url) => {
+    let getDomainFromUrlRegex = /^(?:https?:\/\/)?(?:[^@\n]+@)?(?:www\.)?([^:\/\n?]+)/;
+    let domainName = url.match(getDomainFromUrlRegex);
+    return domainName[0];
 };
 // Generate file name using elements from the URL that was passed in - Assume KissManga Link
 module.exports.fileNameFromKmURL = (url) => {
