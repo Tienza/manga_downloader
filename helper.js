@@ -24,6 +24,10 @@ module.exports.FORCE_ROTATION = '-r';
 
 module.exports.KINDLE_OPTIMIZED = '-k';
 
+// Find differences in two sets
+module.exports.setDiff = (a, b) => {
+    return a.filter((currVal) => !b.has(currVal));
+};
 // Generate a random time stamp to be passed into the arguments list so that it's ignored
 module.exports.NULL_ARG = () => {
     return (new Date()).getTime(); 

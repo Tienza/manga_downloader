@@ -1,10 +1,10 @@
 'use strict'
 
-const mangakakalotScraper = require('./mangakakalot_scraper');
-const imgDownloader = require('./webpage_image_downloader');
 
-const pdfWriter = require('./stitch_to_pdf');
 const helper = require('./helper');
+const mangaPageScraper = require('./kissmanga_chapter_page_scraper');
+const imgDownloader = require('./webpage_image_downloader');
+const pdfWriter = require('./stitch_to_pdf');
 
 const sysArgs = process.argv;
 
@@ -22,7 +22,7 @@ if (typeof require != 'undefined' && require.main == module) {
      * 2. Initialize the download of all img(s) in the img source file and store in /temp
      * 3. Find all the relevant imgs in /temp and stitch into a PDF file named ${outputFileName}
     **/
-    mangakakalotScraper.getImageLinks(url, imgSrcFileName, 
+    mangaPageScraper.getImageLinks(url, imgSrcFileName, 
         () => imgDownloader.initDownloadAllFromFile(imgSrcFileName, 
             () => pdfWriter.initStitchToPdf(imgSrcFileName, outputFileName)));
 }
