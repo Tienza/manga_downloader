@@ -25,12 +25,12 @@ let bulkDownloadErrorCleanUp = (errorDetected, url) => {
 let bulkDownload = () => {
     console.log('bulk_manga_downloader running...');
     // Read in all the manga URLs found in urls.txt and declare initial run variables
-    let URLs = fs.readFileSync(helper.URLS_FILE_NAME).toString().trim().split(/\r?\n/);
+    let URLs = new Set(fs.readFileSync(helper.URLS_FILE_NAME).toString().trim().split(/\r?\n/));
     let processedURLs = [];
     let failedUrls = [];
     let errorDetected = false;
     // For each manga URL spawn a nodejs process to invoke download_and_stich_to_pdf
-    console.log(`Launching ${URLs.length} download_and_stitch_to_pdf threads...`);
+    console.log(`Launching ${URLs.size} download_and_stitch_to_pdf threads...`);
     for (let url of URLs) {
         let r = (sysArgs.has(helper.FORCE_ROTATION)) ? helper.FORCE_ROTATION : helper.NULL_ARG();
         let k = (sysArgs.has(helper.KINDLE_OPTIMIZED)) ? helper.KINDLE_OPTIMIZED : helper.NULL_ARG();
@@ -54,17 +54,17 @@ let bulkDownload = () => {
 
         cmd.on("close", code => {
             processedURLs.push(url); // Increment processedURLs to keep track of how many URLs we have left
-            console.log(`Process ${cmd.pid} exited with code ${code}. (${processedURLs.length}/${URLs.length})`);
+            console.log(`Process ${cmd.pid} exited with code ${code}. (${processedURLs.length}/${URLs.size})`);
             // If all the urls have been processed and no errors were detected
-            if (processedURLs.length + failedUrls.length >= URLs.length && !errorDetected) {
+            if (processedURLs.length + failedUrls.length >= URLs.size && !errorDetected) {
                 // Truncate urls.txt and exit function
                 console.log(`Truncating ${helper.URLS_FILE_NAME}...`);
                 console.log('bulk_manga_downloader successfully executed! Enjoy reading your manga!');
                 fs.writeFileSync(helper.URLS_FILE_NAME, '');
-            } else if (processedURLs.length + failedUrls.length >= URLs.length && errorDetected) {
+            } else if (processedURLs.length + failedUrls.length >= URLs.size && errorDetected) {
                 // Recommend user look at the urls that failed and try running again
                 console.log(`Errors were detected with the following URLs:\n ${failedUrls.join('\n')}`)
-                console.log(`Failed URLs (${failedUrls.length}/${URLs.length}) stored in ${helper.URLS_FILE_NAME}, please try downloading again`);
+                console.log(`Failed URLs (${failedUrls.length}/${URLs.size}) stored in ${helper.URLS_FILE_NAME}, please try downloading again`);
             }
         });
     }
