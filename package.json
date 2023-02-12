@@ -4,7 +4,7 @@
     "description": "Keep track of and download your favorite manga from Mangakakalot in PDF format. Optional Kindle and Kindle PaperWhite optimization and forced rotation of pages.",
     "main": "manga_tracker.js",
     "dependencies": {
-        "got": "^11.8.2",
+        "got": "^12.5.3",
         "hooman": "^1.2.6",
         "pdfkit": "^0.12.1",
         "request": "^2.88.2"
